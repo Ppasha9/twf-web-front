@@ -2,40 +2,47 @@ import { LabeledValue } from "antd/es/select";
 import { ConstructorJSONType } from "../../redux/constructor-jsons/constructor-jsons.types";
 import CSS from "csstype";
 
-export interface ConstructorFormDefaultInput {
+export interface ConstructorFormBaseInput {
   name: string;
-  type: "text" | "number";
   label: string;
   disabled?: boolean;
   isRendered?: boolean;
   isVisible?: boolean;
+  width?: number;
+  panel?: string;
+}
+
+export interface ConstructorFormDefaultInput extends ConstructorFormBaseInput {
+  type: "text" | "number";
   isTextArea?: boolean;
 }
 
-export interface ConstructorFormSelectInput {
-  name: string;
-  label: string;
+export interface ConstructorFormSelectInput extends ConstructorFormBaseInput {
   options: LabeledValue[];
   isMulti: boolean;
   isTags?: boolean;
-  disabled?: boolean;
-  isRendered?: boolean;
-  isVisible?: boolean;
 }
 
-export interface ConstructorFormExpressionInput {
-  name: string;
-  label: string;
+export interface ConstructorFormExpressionInput
+  extends ConstructorFormBaseInput {
   isExpressionInput: true;
-  disabled?: boolean;
-  isRendered?: boolean;
-  isVisible?: boolean;
+}
+
+export interface ConstructorFormMultipleExpressionInput
+  extends ConstructorFormBaseInput {
+  isMultipleExpressionInput: true;
+}
+
+export interface ConstructorRulesInput extends ConstructorFormBaseInput {
+  isRulesInput: true;
 }
 
 export type ConstructorFormInput =
   | ConstructorFormDefaultInput
   | ConstructorFormSelectInput
-  | ConstructorFormExpressionInput;
+  | ConstructorFormExpressionInput
+  | ConstructorFormMultipleExpressionInput
+  | ConstructorRulesInput;
 
 export interface ConstructorFormProps {
   inputs: ConstructorFormInput[];

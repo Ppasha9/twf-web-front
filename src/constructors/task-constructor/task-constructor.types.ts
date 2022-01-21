@@ -1,6 +1,9 @@
 import { RulePackLink } from "../rule-pack-constructor/rule-pack-constructor.types";
 import { MathInputFormat } from "../../utils/kotlin-lib-functions";
-import { RuleConstructorInputs, RuleConstructorReceivedForm } from "../rule-constructor/rule-constructor.types";
+import {
+  RuleConstructorInputs,
+  RuleConstructorReceivedForm,
+} from "../rule-constructor/rule-constructor.types";
 
 export interface ExpressionInput {
   format: MathInputFormat;
@@ -15,6 +18,8 @@ export enum GoalType {
   CNF = "CNF",
   DNF = "DNF",
   FACTORIZATION = "FACTORIZATION",
+  REDUCTION = "REDUCTION",
+  POLYNOM = "POLYNOM",
   UNKNOWN = "UNKNOWN",
 }
 
@@ -79,6 +84,9 @@ export interface TaskConstructorInputs {
   descriptionEn: string;
   descriptionRu: string;
   subjectType: string;
+  taskType: string;
+  computationGoalType: string;
+  reductionGoalType: string;
   tags: string[];
   originalExpression: ExpressionInput;
   goalType: GoalType;

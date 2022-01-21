@@ -22,6 +22,7 @@ const MixedInput = ({
   label,
   isRendered = true,
   isVisible = true,
+  width = 100,
 }: MixedInputProps) => {
   const modeTabs: ModeTab[] = [
     {
@@ -38,9 +39,8 @@ const MixedInput = ({
     },
   ];
 
-  const [currentVisibleFormat, setCurrentVisibleFormat] = useState<
-    MathInputFormat
-  >(format || MathInputFormat.TEX);
+  const [currentVisibleFormat, setCurrentVisibleFormat] =
+    useState<MathInputFormat>(format || MathInputFormat.TEX);
   const [currentInputFormat, setCurrentInputFormat] = useState<MathInputFormat>(
     format || MathInputFormat.TEX
   );
@@ -68,7 +68,10 @@ const MixedInput = ({
         style={
           style
             ? { ...style, display: isVisible ? "block" : "hidden" }
-            : { display: isVisible ? "block" : "hidden" }
+            : {
+                display: isVisible ? "block" : "hidden",
+                flexBasis: `${width - 1}%`,
+              }
         }
       >
         {label && <div className="label">{label}</div>}
@@ -97,9 +100,7 @@ const MixedInput = ({
         {currentVisibleFormat === MathInputFormat.TEX && (
           <EditableMathField
             latex={getVisibleInputValue(MathInputFormat.TEX)}
-            style={{
-              width: "100%",
-            }}
+            className="w-100"
             onChange={(mathField: MathField) => {
               // check if mathquill input is focused
               if (
@@ -138,9 +139,8 @@ const MixedInput = ({
             return (
               <input
                 key={inputFormat}
-                style={{ width: "100%" }}
                 type="text"
-                className={`mixed-input__input form-control ${
+                className={`mixed-input__input form-control w-100 ${
                   error ? "is-invalid" : ""
                 }`}
                 value={getVisibleInputValue(inputFormat)}

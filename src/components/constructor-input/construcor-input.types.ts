@@ -1,10 +1,3 @@
-import { Dispatch } from "react";
-import {
-  ConstructorHistoryItem,
-  ExpressionChange,
-} from "../../redux/constructor-history/constructor-history.types";
-import { ConstructorJSONType } from "../../redux/constructor-jsons/constructor-jsons.types";
-
 export interface ConstructorInputProps {
   name: string;
   type: string;
@@ -16,4 +9,5 @@ export interface ConstructorInputProps {
   onChange?: (value: string) => any;
   value?: any;
   isTextArea?: boolean;
+  width?: number;
 }

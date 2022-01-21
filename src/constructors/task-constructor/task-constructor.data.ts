@@ -10,6 +10,31 @@ export const allPossibleGoalTypes = [
   GoalType.FACTORIZATION,
 ];
 
+export const allPossibleReductionTypes = [
+  {
+    value: GoalType.COMPUTATION,
+    label: "Вычисление",
+  },
+  {
+    value: GoalType.SIMPLIFICATION,
+    label: "Упрощение",
+  },
+  {
+    value: GoalType.CNF,
+    label: "x-КНФ",
+  },
+  {
+    value: GoalType.DNF,
+    label: "x-ДНФ",
+  },
+  {
+    value: GoalType.FACTORIZATION,
+    label: "Факторизация",
+  },
+];
+
+export const allPossibleXTypes = [1, 2, 3, 4];
+
 export const mockSubjectTypes: string[] = [
   "subject type 1",
   "subject type 2",
