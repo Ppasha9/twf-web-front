@@ -10,6 +10,7 @@ import ServerResponseAlert from "../../components/server-response-alert/server-r
 import ActionButton from "../../components/action-button/action-button.component";
 import AppSpinner from "../../components/app-spinner/app-spinner";
 import TexEditorActionsTab from "../../components/tex-editor-actions-tab/tex-editor-actions-tab";
+import MathQuillMultyline from "../../components/math-quill-multyline/math-quill-multyline";
 // utils
 import { checkTexSolutionInFrontFormat } from "../../utils/kotlin-lib-functions";
 import { getAuthToken } from "../../utils/local-storage/auth-token";
@@ -295,6 +296,10 @@ const SolveMathPage: React.FC = () => {
                 minWidth: "42rem",
                 maxWidth: window.innerWidth - 100 + "px",
               }}
+            />
+            <br/>
+            <MathQuillMultyline
+
             />
           </div>
           <ServerResponseAlert
