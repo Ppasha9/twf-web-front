@@ -286,21 +286,7 @@ const SolveMathPage: React.FC = () => {
             </Steps>
           </div>
           <div className="solve-math__tex-solution u-mt-md">
-            {mathField && <TexEditorActionsTab mathField={mathField} />}
-            <EditableMathField
-              latex={solutions[currentTaskIdx]}
-              mathquillDidMount={(mathField: MathField) => {
-                setMathField(mathField);
-              }}
-              style={{
-                minWidth: "42rem",
-                maxWidth: window.innerWidth - 100 + "px",
-              }}
-            />
-            <br/>
-            <MathQuillMultyline
-
-            />
+            <MathQuillMultyline/>
           </div>
           <ServerResponseAlert
             errorMsg={errMessages[currentTaskIdx]}

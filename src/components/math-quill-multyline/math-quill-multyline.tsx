@@ -3,159 +3,204 @@ import React, { useEffect, useState } from "react";
 import { addStyles, EditableMathField, MathField, EditableMathFieldProps } from "react-mathquill";
 // style
 import "./math-quill-multyline.scss";
+import "../tex-editor-actions-tab/tex-editor-actions-tab.scss"
+
+// icons
+import fracIcon from "../../assets/math-symbols/frac.svg";
+import powIcon from "../../assets/math-symbols/pow.svg";
+import sumIcon from "../../assets/math-symbols/sum.svg";
+import prodIcon from "../../assets/math-symbols/prod.svg";
+import squareIcon from "../../assets/math-symbols/square-root.svg";
+import piIcon from "../../assets/math-symbols/pi.svg";
+import andIcon from "../../assets/math-symbols/and.svg";
+import orIcon from "../../assets/math-symbols/or.svg";
+import xorIcon from "../../assets/math-symbols/xor.svg";
+import alleqIcon from "../../assets/math-symbols/alleq.svg";
+import negIcon from "../../assets/math-symbols/neg.svg";
+import implicIcon from "../../assets/math-symbols/implic.svg";
+import setminusIcon from "../../assets/math-symbols/setminus.svg";
 
 interface MathPair {
   text?: string;
+  id?:number;
   mathLine?: MathField;
 }
 
 
 const MathQuillMultyline: React.FC = () => {
   const [numLines, setNumLines] = useState<number>(1);
-    let [lines, setLines] = useState<string[]>([]);
-  const [mathFields, setMathFields] = useState<MathField[]>([]);
-  const [mathPairs, setMathPairs] = useState<MathPair[]>([]);
+  const [counter, setCounter] = useState<number>(2);
+  const [mathPairs, setMathPairs] = useState<MathPair[]>([{text : "solution", id : 1, mathLine : undefined}]);
+  const [focusId, setFocusId] = useState<number>(1);
 
   const onButtonConcat = () => {
     let rez : string;
     rez = "";
     for (let mPair of mathPairs) {
-      if (mPair.text)
-          rez += mPair.text;
+      if (mPair.text && mPair.id != -1)
+        rez += mPair.text;
     }
-    console.log(mathPairs);
     console.log(rez);
   };
 
   const onButtonAddLine = () => {
     setNumLines(numLines + 1);
-  /*  lines?.push(String(numLines));
-    mathFields?.map(
-      (fi : MathField) => {
-          console.log(fi?.latex());
-      }
-    )*/
-    let newPair = {text : String(numLines), mathLine : undefined};
+    setCounter(counter + 1)
+    let newPair = {text : "", id : counter, mathLine : undefined};
     mathPairs?.push(newPair);
-    console.log(newPair);
   };
-/*
-  const onButtonDelLine = (idx : number) => {
-    setNumLines(numLines - 1);
-    lines.splice(idx, 1);
-    mathFields.splice(idx, 1);
-    //console.log(lines);
-  };
-  */
-  const onButtonDelLine = (line?: string) => {
-    let idx : number;
-    idx = -1;
-    if (line)
+
+  const onButtonDelLine = (id?: number) => {
+    if (id)
     {
-    for (let mPair of mathPairs)
-    {
-      if (mPair.text == line)
-      {
-        idx = mathPairs.indexOf(mPair);
-      }
+      let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == id})
+      mathPairs[idx].text = undefined;
+      mathPairs[idx].id = -1;
+      setNumLines(numLines - 1);
     }
-     //let rem = mathPairs.splice(idx, 1);
-     //delete rem[0].mathLine;
-     mathPairs[idx].text = undefined;
-     setNumLines(numLines - 1);
-   }
   };
-
-  return (
-    <div className = "aaaaa">
+  const actions = [
     {
-      mathPairs?.map(
-        (matPair : MathPair) =>
-        {
-          if (matPair.text)
-          {
-          return(
-            <>
-            <br/>
-            <button
-              className="btn minus"
-              onClick={() => {
-                onButtonDelLine(matPair.text);
-              }}
-            >
-              -
-            </button>
-            <EditableMathField
-              latex={matPair.text}
-              mathquillDidMount={(mathField: MathField) => {
-
-                let idx : number;
-                idx = -1;
-                for (let mPair of mathPairs)
-                {
-                  if (mPair.text == matPair.text)
-                  {
-                    idx = mathPairs.indexOf(mPair);
-                  }
+      iconUrl: fracIcon,
+      latexCmd: "\\frac",
+    },
+    {
+      iconUrl: powIcon,
+      latexCmd: "^",
+    },
+    {
+      iconUrl: squareIcon,
+      latexCmd: "\\sqrt",
+    },
+    {
+      iconUrl: piIcon,
+      latexCmd: "\\pi",
+    },
+    {
+      iconUrl: sumIcon,
+      latexCmd: "\\sum",
+    },
+    {
+      iconUrl: prodIcon,
+      latexCmd: "\\prod",
+    },
+    {
+      iconUrl: negIcon,
+      latexCmd: "\\neg",
+    },
+    {
+      iconUrl: andIcon,
+      latexCmd: "\\wedge",
+    },
+    {
+      iconUrl: orIcon,
+      latexCmd: "\\vee",
+    },
+    {
+      iconUrl: xorIcon,
+      latexCmd: "\\oplus",
+    },
+    {
+      iconUrl: alleqIcon,
+      latexCmd: "\\equiv",
+    },
+    {
+      iconUrl: implicIcon,
+      latexCmd: "\\implies",
+    },
+    {
+      iconUrl: setminusIcon,
+      latexCmd: "\\setminus",
+    },
+  ];
+  return (
+    <div className = "solve-math__tex-solution u-mt-md">
+      <div className="tex-editor-actions-tab">
+        {actions.map((action, i) => {
+          const { iconUrl, latexCmd } = action;
+          return (
+            <div key={i} className="tex-editor-actions-tab__operation">
+              <img src={iconUrl} onClick={() => {
+                if (focusId && focusId != -1) {
+                  let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
+                  focusedPair?.mathLine?.cmd(latexCmd);
+                  focusedPair?.mathLine?.focus();
                 }
-                let newPair = {text : mathField.latex(), mathLine : mathField};
-                mathPairs[idx] = newPair;
+                else
+                {
+                  console.log("WARN: nothings focused");
+                }
+              }} />
+            </div>
+          );
+        })}
+      </div>
+      {
+        mathPairs?.map(
+          (matPair : MathPair) =>
+          {
+            if (matPair.id != -1)
+            {
+            return(<>
+              <button
+                className="btn"
+                onClick={() => {
+                  onButtonDelLine(matPair.id);
+                }}
+              >
+                -
+              </button>
+              <EditableMathField
+                latex={matPair.text}
+                mathquillDidMount={(mathField: MathField) => {
+                  let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == matPair.id});
+                  let newPair = {text : mathField.latex(), id: mathPairs[idx].id, mathLine : mathField};
+                  mathPairs[idx] = newPair;
+                  mathField.focus();
                 }}
                 onChange={(mathField: MathField) => {
-                  console.log(mathField.latex());
-                  let idx : number;
-                  idx = -1;
                   for (let mPair of mathPairs)
-                  {
-                    if (mPair?.mathLine == mathField)
-                        console.log(mathPairs.indexOf(mPair));
+                    if (mPair && mPair.text != mPair?.mathLine?.latex())
+                      mPair.text = mPair?.mathLine?.latex();
+                }}
+                onFocus={() => {
+                  setFocusId(matPair.id ? matPair.id : -1);
+                }}
+                style={{
+                  minWidth: "42rem",
+                  maxWidth: window.innerWidth - 100 + "px",
+                }}
+              />
+              <br/>
+            </>);
+          }
+            else
+            {
+              return (<></>);
+            }
+          }
+        )
+      }
 
-                    if (mPair)
-                        if (mPair.text)
-                        mPair.text = mPair?.mathLine?.latex();
-                  }
-                  console.log(mathField);
-                  console.log(mathPairs);
-
-                  //console.log(lines);
-                   //setLines(mathField.latex())}
-                 }}
-              style={{
-                minWidth: "42rem",
-                maxWidth: window.innerWidth - 100 + "px",
-              }}
-            />
-            </>
-          );
-        }
-        else
-        {
-          return (<></>);
-        }
-        }
-      )
-    }
-
-
-      <div className = "but">
-      <button
-        className="btn plus"
-        onClick={() => {
-          onButtonAddLine();
-        }}
-      >
-        +
-      </button>
-      <button
-        className="btn concat"
-        onClick={() => {
-          onButtonConcat();
-        }}
-      >
-        Log solution
-      </button>
+      <div className = "mq-multyline-buttons">
+        <button
+          className="btn"
+          onClick={() => {
+            onButtonAddLine();
+          }}
+        >
+          +
+        </button>
+        <button
+          className="btn"
+          onClick={() => {
+            onButtonConcat();
+          }}
+        >
+          Log solution
+        </button>
       </div>
-  </div>
+    </div>
   );
 };
 

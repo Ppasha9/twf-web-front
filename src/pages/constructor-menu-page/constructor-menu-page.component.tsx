@@ -412,23 +412,6 @@ const ConstructorMenuPageComponent: React.FC = () => {
   return (
     <div className="constructor-menu-page">
       <ul className="constructor-menu-page__tabs">
-      <div className="solve-math__tex-solution u-mt-md">
-        {mathField && <TexEditorActionsTab mathField={mathField} />}
-        <EditableMathField
-          latex={"latex here"}
-          mathquillDidMount={(mathField: MathField) => {
-            setMathField(mathField);
-          }}
-          style={{
-            minWidth: "42rem",
-            maxWidth: window.innerWidth - 100 + "px",
-          }}
-        />
-        <br/>
-        <MathQuillMultyline
-
-        />
-          </div>
         <li
           className={`constructor-menu-page__tab ${currentTab === tabs[0] && "constructor-menu-page__tab--active"
             }`}
