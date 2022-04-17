@@ -38,7 +38,7 @@ const MathQuillMultyline: React.FC = () => {
     rez = "";
     for (let mPair of mathPairs) {
       if (mPair.text && mPair.id != -1)
-        rez += mPair.text;
+        rez += mPair.text + "\n";
     }
     console.log(rez);
   };
@@ -48,6 +48,7 @@ const MathQuillMultyline: React.FC = () => {
     setCounter(counter + 1)
     let newPair = {text : "", id : counter, mathLine : undefined};
     mathPairs?.push(newPair);
+
   };
 
   const onButtonDelLine = (id?: number) => {
@@ -56,7 +57,20 @@ const MathQuillMultyline: React.FC = () => {
       let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == id})
       mathPairs[idx].text = undefined;
       mathPairs[idx].id = -1;
+      //delete mathPairs[idx].mathLine
+      //delete mathPairs[idx]
+      //mathPairs.splice(idx, 1)
       setNumLines(numLines - 1);
+      //setCounter(counter - 1)
+      //for (let i = 0; i < mathPairs.length; i++)
+      //  mathPairs[i].id = i + 1
+      for (let i = mathPairs.length - 1; i >= 0; i--)
+        if (mathPairs[i].id != -1 && mathPairs[i])
+        {
+          mathPairs[i]?.mathLine?.focus();
+          break;
+        }
+
     }
   };
   const actions = [
@@ -165,6 +179,59 @@ const MathQuillMultyline: React.FC = () => {
                 }}
                 onFocus={() => {
                   setFocusId(matPair.id ? matPair.id : -1);
+                  console.log('OnFocus');
+                }}
+                onKeyDown={(e) =>{
+                  if (e.key == 'Enter')
+                  {
+                    console.log('Enter press here! ')
+                    if (focusId && focusId != -1) {
+                      let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
+                      let text = focusedPair?.mathLine?.latex()
+                      console.log(text);
+                      if (text && text.length == 0)
+                      {
+                        console.log('None');
+                        //onButtonDelLine(matPair.id);
+
+                      }
+                      else if (!text)
+                      {
+                        onButtonAddLine();
+                        console.log('Add');
+                      }
+                    //focusedPair?.mathLine?.focus()
+                    //let mq = focusedPair?.mathLine
+                    //let а = mq?.__controller.cursor.offset()
+                  }}
+                  if (e.key == 'Backspace'){
+
+                    console.log(e.key)
+                    if (focusId && focusId != -1) {
+                      let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
+                      let text = focusedPair?.mathLine?.latex()
+                      console.log(text);
+                      if (text && text.length == 0)
+                      {
+                        console.log('None');
+                        //onButtonDelLine(matPair.id);
+
+                      }
+                      else if (!text)
+                      {
+                        onButtonDelLine(matPair.id);
+                        console.log('Delete');
+                      }
+                    }
+                  }
+                  if (e.key == 'Alt')
+                  {
+                    console.log(e.key)
+                    console.log(mathPairs)
+
+                  }
+
+
                 }}
                 style={{
                   minWidth: "42rem",
