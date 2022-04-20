@@ -47,22 +47,29 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
   const [mathPairs, setMathPairs] = useState<MathPair[]>([{text : "solution", id : 1, mathLine : undefined}]);
   const [focusId, setFocusId] = useState<number>(1);
   const [mathPairsid, setMathPairsid] = useState<number[]>([1]);
-  let splitted = [];
+  let splitted: string[];
+  splitted = [];
   if (latex)
     splitted = latex.split("\n", 7);
-  /*useEffect(() => {
-    if (mathField.current && mathField.current.latex() !== latex) {
-      mathField.current.latex(latex)
+  useEffect(() => {
+    for (let i = splitted.length - mathPairsid.length; i > 0; i--) {
+      onButtonAddLine()
+      mathPairs[mathPairs.length - 1].id = mathPairs.length
     }
+
+    for (let i = 0; i < mathPairs.length; i++) {
+      mathPairs[i].text = splitted[i]
+    }
+
   }, [latex])
-  */
+
   const UpdateId = () =>
   {
-    let newid = []
+    let newid = [];
     for (let idx = 0; idx < mathPairs.length; idx++)
     {
       if (mathPairs[idx].id != -1)
-        newid.push(idx)
+        newid.push(idx);
     }
     setMathPairsid(newid)
   }
@@ -83,6 +90,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
     setCounter(counter + 1)
     let newPair = {text : "", id : counter, mathLine : undefined};
     mathPairs?.push(newPair);
+    console.log(counter);
     UpdateId();
   };
 
@@ -119,12 +127,11 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
           if (newtext.length != 0)
             mathPairs[mathPairsid[idx1 - 1]].text = newtext
         } else {
-          let newtext = text0 + '\\ ' + text
-          console.log(newtext)
-          console.log("wow")
+          let newtext = text0 + '\\ ' + text;
+          console.log(newtext);
           if (text && text.length != 0)
           {
-            mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.latex(newtext)
+            mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.latex(newtext);
           }
         }
       }
@@ -248,11 +255,11 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                   onKeyDown={(e) =>{
                     if (e.key == 'Enter')
                     {
-                      console.log('Enter press here! ')
+                      console.log('Enter press here! ');
                       if (focusId && focusId != -1) {
                         let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
-                        let text = focusedPair?.mathLine?.latex()
-                        console.log(text);
+                        let text = focusedPair?.mathLine?.latex();
+                        console.log(text);;
                         if (text && text.length == 0)
                         {
                           console.log('None');
@@ -264,9 +271,12 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                           onButtonAddLine();
                           console.log('Add');
                         }
-                        //focusedPair?.mathLine?.focus()
-                        //let mq = focusedPair?.mathLine
-                        //let а = mq?.__controller.cursor.offset()
+                        /*focusedPair?.mathLine?.focus()
+                        let mq: MathField;
+                        if (focusedPair?.mathLine) {
+                          mq = focusedPair?.mathLine;
+                          let а = mq!.__controller.cursor.offset()
+                        }*/
                       }}
                     if (e.key == 'Backspace'){
 
@@ -291,9 +301,9 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                     if (e.key == 'Alt')
                     {
                       //console.log(e.key)
-                      console.log("ver2.7")
-                      console.log(mathPairsid)
-                      console.log(mathPairs)
+                      console.log("ver2.7");
+                      console.log(mathPairsid);
+                      console.log(mathPairs);
 
                     }
 
