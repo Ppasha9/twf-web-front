@@ -1,3 +1,5 @@
+// types
+//import PropTypes from 'prop-types';
 // libs and hooks
 import React, { useEffect, useState } from "react";
 import { addStyles, EditableMathField, MathField, EditableMathFieldProps } from "react-mathquill";
@@ -19,6 +21,8 @@ import alleqIcon from "../../assets/math-symbols/alleq.svg";
 import negIcon from "../../assets/math-symbols/neg.svg";
 import implicIcon from "../../assets/math-symbols/implic.svg";
 import setminusIcon from "../../assets/math-symbols/setminus.svg";
+//import { Simulate } from "react-dom/test-utils";
+//import copy = Simulate.copy;
 
 interface MathPair {
   text?: string;
@@ -26,12 +30,43 @@ interface MathPair {
   mathLine?: MathField;
 }
 
+type MultylineProps = {
+  latex?: string,
+  //onChange: Function,
+  config?: object,
+  //mathquillDidMount?: Function,
+}
 
-const MathQuillMultyline: React.FC = () => {
+const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
+                                                        //onChange,
+                                                        config,
+                                                        //mathquillDidMount,
+                                                        ...otherProps}) => {
   const [numLines, setNumLines] = useState<number>(1);
   const [counter, setCounter] = useState<number>(2);
   const [mathPairs, setMathPairs] = useState<MathPair[]>([{text : "solution", id : 1, mathLine : undefined}]);
   const [focusId, setFocusId] = useState<number>(1);
+  const [mathPairsid, setMathPairsid] = useState<number[]>([1]);
+  let splitted = [];
+  if (latex)
+    splitted = latex.split("\n", 7);
+  /*useEffect(() => {
+    if (mathField.current && mathField.current.latex() !== latex) {
+      mathField.current.latex(latex)
+    }
+  }, [latex])
+  */
+  const UpdateId = () =>
+  {
+    let newid = []
+    for (let idx = 0; idx < mathPairs.length; idx++)
+    {
+      if (mathPairs[idx].id != -1)
+        newid.push(idx)
+    }
+    setMathPairsid(newid)
+  }
+
 
   const onButtonConcat = () => {
     let rez : string;
@@ -48,13 +83,18 @@ const MathQuillMultyline: React.FC = () => {
     setCounter(counter + 1)
     let newPair = {text : "", id : counter, mathLine : undefined};
     mathPairs?.push(newPair);
-
+    UpdateId();
   };
 
   const onButtonDelLine = (id?: number) => {
-    if (id)
-    {
-      let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == id})
+    if (id) {
+      let idx = mathPairs.findIndex((mp: MathPair) => {
+        return mp.id == id
+      })
+      let idx1 = mathPairsid.findIndex((i: number) => {
+        return i == idx
+      })
+      let text = mathPairs[idx].text
       mathPairs[idx].text = undefined;
       mathPairs[idx].id = -1;
       //delete mathPairs[idx].mathLine
@@ -64,13 +104,37 @@ const MathQuillMultyline: React.FC = () => {
       //setCounter(counter - 1)
       //for (let i = 0; i < mathPairs.length; i++)
       //  mathPairs[i].id = i + 1
-      for (let i = mathPairs.length - 1; i >= 0; i--)
+
+      if (text) {
+        if (idx1 == 0)
+          idx1 = 1;
+        mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.focus();
+        let text0 = mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.latex()
+        console.log(text0)
+        console.log("+")
+        console.log(text)
+        if (!text0) {
+          let newtext = text
+          console.log(newtext)
+          if (newtext.length != 0)
+            mathPairs[mathPairsid[idx1 - 1]].text = newtext
+        } else {
+          let newtext = text0 + '\\ ' + text
+          console.log(newtext)
+          console.log("wow")
+          if (text && text.length != 0)
+          {
+            mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.latex(newtext)
+          }
+        }
+      }
+      /*for (let i = mathPairs.length - 1; i >= 0; i--)
         if (mathPairs[i].id != -1 && mathPairs[i])
         {
           mathPairs[i]?.mathLine?.focus();
           break;
-        }
-
+        }*/
+      UpdateId();
     }
   };
   const actions = [
@@ -155,92 +219,94 @@ const MathQuillMultyline: React.FC = () => {
           {
             if (matPair.id != -1)
             {
-            return(<>
-              <button
-                className="btn"
-                onClick={() => {
-                  onButtonDelLine(matPair.id);
-                }}
-              >
-                -
-              </button>
-              <EditableMathField
-                latex={matPair.text}
-                mathquillDidMount={(mathField: MathField) => {
-                  let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == matPair.id});
-                  let newPair = {text : mathField.latex(), id: mathPairs[idx].id, mathLine : mathField};
-                  mathPairs[idx] = newPair;
-                  mathField.focus();
-                }}
-                onChange={(mathField: MathField) => {
-                  for (let mPair of mathPairs)
-                    if (mPair && mPair.text != mPair?.mathLine?.latex())
-                      mPair.text = mPair?.mathLine?.latex();
-                }}
-                onFocus={() => {
-                  setFocusId(matPair.id ? matPair.id : -1);
-                  console.log('OnFocus');
-                }}
-                onKeyDown={(e) =>{
-                  if (e.key == 'Enter')
-                  {
-                    console.log('Enter press here! ')
-                    if (focusId && focusId != -1) {
-                      let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
-                      let text = focusedPair?.mathLine?.latex()
-                      console.log(text);
-                      if (text && text.length == 0)
-                      {
-                        console.log('None');
-                        //onButtonDelLine(matPair.id);
-
-                      }
-                      else if (!text)
-                      {
-                        onButtonAddLine();
-                        console.log('Add');
-                      }
-                    //focusedPair?.mathLine?.focus()
-                    //let mq = focusedPair?.mathLine
-                    //let а = mq?.__controller.cursor.offset()
+              return(<>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    onButtonDelLine(matPair.id);
                   }}
-                  if (e.key == 'Backspace'){
+                >
+                  -
+                </button>
+                <EditableMathField
+                  latex={matPair.text}
+                  mathquillDidMount={(mathField: MathField) => {
+                    let idx = mathPairs.findIndex((mp:MathPair)=>{return mp.id == matPair.id});
+                    let newPair = {text : mathField.latex(), id: mathPairs[idx].id, mathLine : mathField};
+                    mathPairs[idx] = newPair;
+                    mathField.focus();
+                  }}
+                  onChange={(mathField: MathField) => {
+                    for (let mPair of mathPairs)
+                      if (mPair && mPair.text != mPair?.mathLine?.latex())
+                        mPair.text = mPair?.mathLine?.latex();
+                  }}
+                  onFocus={() => {
+                    setFocusId(matPair.id ? matPair.id : -1);
+                    console.log('OnFocus');
+                  }}
+                  onKeyDown={(e) =>{
+                    if (e.key == 'Enter')
+                    {
+                      console.log('Enter press here! ')
+                      if (focusId && focusId != -1) {
+                        let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
+                        let text = focusedPair?.mathLine?.latex()
+                        console.log(text);
+                        if (text && text.length == 0)
+                        {
+                          console.log('None');
+                          //onButtonDelLine(matPair.id);
 
-                    console.log(e.key)
-                    if (focusId && focusId != -1) {
-                      let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
-                      let text = focusedPair?.mathLine?.latex()
-                      console.log(text);
-                      if (text && text.length == 0)
-                      {
-                        console.log('None');
-                        //onButtonDelLine(matPair.id);
+                        }
+                        else if (!text)
+                        {
+                          onButtonAddLine();
+                          console.log('Add');
+                        }
+                        //focusedPair?.mathLine?.focus()
+                        //let mq = focusedPair?.mathLine
+                        //let а = mq?.__controller.cursor.offset()
+                      }}
+                    if (e.key == 'Backspace'){
 
-                      }
-                      else if (!text)
-                      {
-                        onButtonDelLine(matPair.id);
-                        console.log('Delete');
+                      console.log(e.key)
+                      if (focusId && focusId != -1) {
+                        let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
+                        let text = focusedPair?.mathLine?.latex()
+                        console.log(text);
+                        if (text && text.length == 0)
+                        {
+                          console.log('None');
+                          //onButtonDelLine(matPair.id);
+
+                        }
+                        else if (!text)
+                        {
+                          onButtonDelLine(matPair.id);
+                          console.log('Delete');
+                        }
                       }
                     }
-                  }
-                  if (e.key == 'Alt')
-                  {
-                    console.log(e.key)
-                    console.log(mathPairs)
+                    if (e.key == 'Alt')
+                    {
+                      //console.log(e.key)
+                      console.log("ver2.7")
+                      console.log(mathPairsid)
+                      console.log(mathPairs)
 
-                  }
+                    }
 
 
-                }}
-                style={{
-                  minWidth: "42rem",
-                  maxWidth: window.innerWidth - 100 + "px",
-                }}
-              />
-              <br/>
-            </>);
-          }
+                  }}
+                  style={{
+                    minWidth: "42rem",
+                    maxWidth: window.innerWidth - 100 + "px",
+                  }}
+                />
+                <br/>
+              </>);
+            }
             else
             {
               return (<></>);
