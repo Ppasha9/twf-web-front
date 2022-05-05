@@ -165,6 +165,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
           mathPairs[i]?.mathLine?.focus();
           break;
         }*/
+      mathPairs[mathPairsid[idx1 - 1]]?.mathLine?.focus();
       UpdateId();
     }
   };
@@ -406,10 +407,64 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                           //onButtonDelLine(matPair.id);
 
                         }
-                        else if (!text)
+                        // Optional
+                        else if (!text && mathPairsid.length > 1)
                         {
                           onButtonDelLine(matPair.id);
                           console.log('Delete');
+                        }
+                        else if (text && text.length != 0)
+                        {
+                          console.log("remove text")
+                          //console.log(text)
+                          let code = '#1337';
+                          focusedPair?.mathLine?.typedText(code)
+                          text = focusedPair?.mathLine?.latex()
+                          let s = text;
+                          let a = s.indexOf(code);
+                          console.log(a);
+                          if (a == -1)
+                            console.log(s)
+                          let s0 = '';
+                          let s1 = '';
+                          for (let i = 0; i < a; i++) {
+                            s0 = s0.concat(text[i]);
+                          }
+                          console.log('s0->' + s0);
+                          if (text.length > s0.length + code.length)
+                          {
+                            for (let i = s0.length + code.length; i < text.length; i++) {
+                              s1 = s1.concat(text[i]);
+                            }
+
+                          }
+                          console.log('s1->' + s1);
+                          let currPair = 0;
+                          for (let i = 0; i < mathPairsid.length; i++) {
+                            if (focusId != mathPairs[mathPairsid[i]].id)
+                              continue;
+                            if (focusId == mathPairs[mathPairsid[i]].id)
+                            {
+                              currPair = i;
+                              break;
+                            }
+                          }
+                          if (s0.length == 0){
+                            if (currPair > 0) {
+                              console.log(mathPairsid.length);
+                              mathPairs[mathPairsid[currPair]].text = s1;
+                              onButtonDelLine(mathPairs[mathPairsid[currPair]].id);
+                            }
+                            else
+                            {
+                              mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
+                            }
+                          }
+                          else
+                          {
+                            console.log(s0 + s1)
+                            mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
+                          }
                         }
                       }
                     }
