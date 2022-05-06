@@ -48,7 +48,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
   const [first, setFirst] = useState<number>(1);
   const [mathPairs, setMathPairs] = useState<MathPair[]>([{text : "solution", id : 1, mathLine : undefined}]);
   const [focusId, setFocusId] = useState<number>(1);
-  const [mathPairsid, setMathPairsid] = useState<number[]>([1]);
+  const [mathPairsid, setMathPairsid] = useState<number[]>([0]);
   // latex prop
   let splitted: string[];
   splitted = [];
@@ -65,7 +65,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
       console.log(counter)
     }*/
     for (let i = 0; i < mathPairs.length; i++) {
-      mathPairs[i].text = splitted[i]
+      mathPairs[i].text = splitted[i];
     }
     //initcnt = (mathPairs.length)
     console.log(counter);
@@ -268,7 +268,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                     let newPair = {text : mathField.latex(), id: mathPairs[idx].id, mathLine : mathField};
                     mathPairs[idx] = newPair;
                     mathField.focus();
-                    console.log(mathField.text())
+                    console.log("text1->" + mathField.text())
                   }}
                   onChange={(mathField: MathField) => {
                     for (let mPair of mathPairs)
@@ -440,6 +440,8 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                           }
                           console.log('s1->' + s1);
                           let currPair = 0;
+                          console.log(mathPairsid);
+                          console.log(mathPairs);
                           for (let i = 0; i < mathPairsid.length; i++) {
                             if (focusId != mathPairs[mathPairsid[i]].id)
                               continue;
@@ -457,12 +459,15 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                             }
                             else
                             {
+                              console.log(s0 + s1);
+                              mathPairs[mathPairsid[currPair]].text = s0 + s1;
                               mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
                             }
                           }
                           else
                           {
-                            console.log(s0 + s1)
+                            console.log(s0 + s1);
+                            mathPairs[mathPairsid[currPair]].text = s0 + s1;
                             mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
                           }
                         }
