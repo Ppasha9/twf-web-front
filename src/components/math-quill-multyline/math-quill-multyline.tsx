@@ -21,9 +21,6 @@ import alleqIcon from "../../assets/math-symbols/alleq.svg";
 import negIcon from "../../assets/math-symbols/neg.svg";
 import implicIcon from "../../assets/math-symbols/implic.svg";
 import setminusIcon from "../../assets/math-symbols/setminus.svg";
-import PropTypes from 'prop-types';
-//import { Simulate } from "react-dom/test-utils";
-//import copy = Simulate.copy;
 
 interface MathPair {
   text?: string;
@@ -118,6 +115,237 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
     UpdateId();
   };
 
+  const EndString = (text: string) => {
+    let TagList = [];
+    for (let i = 0; i < text.length; i++)
+    {
+      switch (text[i]) {
+        case '{':
+          TagList.push("}");
+          break;
+        case '[':
+          TagList.push("]");
+          break;
+        case '(':
+          TagList.push(")");
+          break;
+        case '}':
+        case ']':
+        case ')':
+          let t = TagList.pop();
+          if (t != text[i])
+          {
+            console.log("Error");
+            console.log(t);
+            console.log(text[i]);
+            console.log(text);
+          }
+          break;
+      }
+    }
+    let out = "";
+    console.log(TagList);
+    for(let i = 0 ; i < TagList.length; i++) {
+      out += TagList[i];
+    }
+    return out;
+  }
+  const BeginString = (text: string) => {
+    let TagList = [];
+    for (let i = text.length - 1; i >= 0; i--)
+    {
+      switch (text[i]) {
+        case '}':
+          TagList.push("{");
+          break;
+        case ']':
+          TagList.push("[");
+          break;
+        case ')':
+          TagList.push("(");
+          break;
+        case '{':
+        case '[':
+        case '(':
+          let t = TagList.pop();
+          if (t != text[i])
+          {
+            console.log("Error");
+            console.log(t);
+            console.log(text[i]);
+            console.log(text)
+          };
+          break;
+      }
+    }
+    let out = "";
+    console.log(TagList);
+    for(let i = 0 ; i < TagList.length; i++) {
+      out += TagList[i];
+    }
+    return TagList;
+  }
+  const FindOpenTags = (tagList: string[], text: string) => {
+    let tagListNew = [] as string[];
+    // Possibility flag
+    let flagPoss = true;
+    let tagsCompleted = 0;
+    for (let i = text.length - 1; i >= 0; i--) {
+      if (tagList.length == 0) {
+        let out = "";
+        console.log(tagListNew);
+        for (let i = 0; i < tagListNew.length; i++) {
+          out += tagListNew[i];
+        }
+        console.log(flagPoss);
+        return {out, flagPoss};
+      }
+
+      switch (text[i]) {
+        case '}':
+          tagList.push("{");
+          tagsCompleted++;
+          break;
+        case ']':
+          tagList.push("[");
+          tagsCompleted++;
+          break;
+        case ')':
+          tagList.push("(");
+          tagsCompleted++;
+          break;
+        case '{':
+        case '[':
+        case '(':
+          let t = tagList.pop();
+          if (tagsCompleted > 0)
+          {
+            tagsCompleted--;
+            if (t != text[i])
+            {
+              console.log("Error");
+              console.log(t);
+              console.log(text[i]);
+              console.log(text);
+            }
+          }
+          else
+          {
+            let flag = true;
+            if (text[i] == '{')
+            {
+              if (i >= "\\underline".length)
+              {
+                let str = text.slice(i - "\\underline".length, i);
+                console.log(i - "\\underline".length);
+                console.log("\\underline".length);
+                if (str === "\\underline")
+                {
+                  tagListNew.push("\\underline{");
+                  flag = false;
+                }
+                else
+                {
+                  console.log("debug2");
+                  console.log(str);
+                  console.log(text);
+                  console.log(i);
+                }
+              }
+              else {
+                console.log("debug");
+                console.log(text);
+                console.log(i);
+
+              }
+            if (i > "\\textcolor{red}".length && flag)
+              if (text[i - 1] == '}') {
+                let j = i;
+                let s = "";
+                while (text[j] != '\\' && j >= 0) {
+                  s = text[j] + s;
+                  j--;
+                }
+                  if (j == 0 && text[j] != '\\')
+                  {// bad
+                    flagPoss = false;
+                    console.log("bad" + "__" + i.toString());
+                    console.log(text);
+                    console.log(s);
+                  }
+                  else
+                  {
+                    // check correct
+                    console.log("checking");
+                    let s1 = s.slice(0, "textcolor".length);
+                    if (s1 === "textcolor")
+                    {
+                      s = "\\" + s;
+                      tagListNew.push(s);
+                    }
+                    else
+                    {
+                      console.log("different");
+                      console.log(s1);
+                      console.log(s);
+
+                    }
+                  }
+
+              }
+            }
+            else
+            {
+              console.log("bad2" + text + "__" + i.toString());
+              flagPoss = false;
+            }
+
+
+          }
+      }
+    }
+
+  }
+  const ClearStr = (text: string) => {
+    const SpecialTag = "\\textcolor";
+    let t1 = text;
+    // first run
+    console.log("run");
+    console.log(text)
+    while (true) {
+      let a1 = t1.indexOf(SpecialTag);
+      console.log(a1)
+      if (a1 >= 0)
+      {
+        let s0 = t1.slice(0, a1);
+        let i = SpecialTag.length;
+        let s1 = "";
+        if (t1[i] == '{')
+        {
+          do {
+            i++;
+          }
+          while (t1[i] != '}');
+          s1 = t1.slice(a1 + i + 1);
+        }
+        else
+        {
+          console.log("bug");
+          console.log(t1);
+          console.log(text);
+        }
+        t1 = s0 + s1;
+        console.log(t1);
+      }
+      else
+      {
+        break;
+      }
+
+    }
+
+    console.log("end run");
+  }
   const onButtonDelLine = (id?: number) => {
     if (id) {
       let idx = mathPairs.findIndex((mp: MathPair) => {
@@ -288,6 +516,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                         let text = focusedPair?.mathLine?.latex();
 
                         console.log(text);
+                        ClearStr(text);
                         // tests
                         //let mp : any
                         //mp = focusedPair
@@ -332,7 +561,23 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
 
                           }
                           console.log('s1->' + s1);
-                          let currPair = 0;
+                          let test = EndString(s0);
+                          console.log("test->"+test);
+                          let tags1 = BeginString(s1);
+                          console.log("test1->"+tags1);
+                          let test2 = FindOpenTags(tags1, s0);
+                          console.log(test2);
+
+                          if (test2 && test2.out && test2.flagPoss == true) {
+                            s1 = test2.out + s1;
+                            s0 = s0 + test;
+                          }if (test2 && test2.flagPoss == false) {
+                            focusedPair?.mathLine?.latex(s0 + s1);
+                            //focusedPair?.text = s0 + s1;
+                            return;
+                          }
+
+                            let currPair = 0;
                           for (let i = 0; i < mathPairsid.length; i++) {
                             if (focusId != mathPairs[mathPairsid[i]].id)
                               continue;
