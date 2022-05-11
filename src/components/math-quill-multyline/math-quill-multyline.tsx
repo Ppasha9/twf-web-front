@@ -198,7 +198,8 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
           out += tagListNew[i];
         }
         console.log(flagPoss);
-        return {out, flagPoss};
+        let L = tagListNew.length;
+        return {out, flagPoss, L};
       }
 
       switch (text[i]) {
@@ -561,17 +562,23 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
 
                           }
                           console.log('s1->' + s1);
-                          let test = EndString(s0);
-                          console.log("test->"+test);
+                          let tags = EndString(s0);
+                          console.log("test->"+tags);
                           let tags1 = BeginString(s1);
                           console.log("test1->"+tags1);
-                          let test2 = FindOpenTags(tags1, s0);
-                          console.log(test2);
+                          let l = tags1.length;
+                          let tags2 = FindOpenTags(tags1, s0);
+                          console.log(tags2);
 
-                          if (test2 && test2.out && test2.flagPoss == true) {
-                            s1 = test2.out + s1;
-                            s0 = s0 + test;
-                          }if (test2 && test2.flagPoss == false) {
+                          if (tags2 && tags2.out && tags2.flagPoss == true && tags2.L == l) {
+                            s1 = tags2.out + s1;
+                            s0 = s0 + tags;
+                          }
+                          else /*(test2 && test2.flagPoss == false || )*/
+                          {
+                            if (tags2)
+                              console.log(tags2.L)
+                            console.log(l)
                             focusedPair?.mathLine?.latex(s0 + s1);
                             //focusedPair?.text = s0 + s1;
                             return;
@@ -717,6 +724,35 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                           }
                         }
                       }
+                    }
+                    if (e.key == 'ArrowUp') {
+                      console.log(e.key);
+                      if (focusId && focusId != -1) {
+                        let focusedPair = mathPairsid.find((mp: number) => {
+                          return mathPairs[mathPairsid[mp]]?.id == focusId
+                        });
+                        if (focusedPair && focusedPair > 0)
+                          mathPairs[mathPairsid[focusedPair - 1]]?.mathLine?.focus();
+                      }
+                    }
+                      if (e.key == 'ArrowDown')
+                      {
+                        console.log(e.key);
+                        if (focusId && focusId != -1) {
+                          let focusedPair = mathPairsid.find((mp: number) => {
+                            return mathPairs[mathPairsid[mp]].id == focusId
+                          });
+                          if (focusedPair  != null && focusedPair < mathPairsid.length - 1) {
+                            console.log(focusedPair);
+                            mathPairs[mathPairsid[focusedPair + 1]]?.mathLine?.focus();
+                          }
+                          else
+                          {
+                            console.log(focusedPair);
+                            console.log(mathPairsid.length - 1);
+                          }
+                        }
+
                     }
                     if (e.key == 'End')
                     {
