@@ -121,46 +121,8 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
 
 
 
-  const ClearStr = (text: string) => {
-    const SpecialTag = "\\textcolor";
-    let t1 = text;
-    // first run
-    console.log("run");
-    console.log(text)
-    while (true) {
-      let a1 = t1.indexOf(SpecialTag);
-      console.log(a1)
-      if (a1 >= 0)
-      {
-        let s0 = t1.slice(0, a1);
-        let i = SpecialTag.length;
-        let s1 = "";
-        if (t1[i] == '{')
-        {
-          do {
-            i++;
-          }
-          while (t1[i] != '}');
-          s1 = t1.slice(a1 + i + 1);
-        }
-        else
-        {
-          console.log("bug");
-          console.log(t1);
-          console.log(text);
-        }
-        t1 = s0 + s1;
-        console.log(t1);
-      }
-      else
-      {
-        break;
-      }
 
-    }
-
-    console.log("end run");
-  }
+  
   const onButtonDelLine = (id?: number) => {
     if (id) {
       let idx = mathPairs.findIndex((mp: MathPair) => {
@@ -330,8 +292,6 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                         let focusedPair = mathPairs.find((mp:MathPair)=>{return mp.id == focusId});
                         let text = focusedPair?.mathLine?.latex();
 
-                        console.log(text);
-                        ClearStr(text);
                         // tests
                         //let mp : any
                         //mp = focusedPair
@@ -342,7 +302,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                         //document.dispatchEvent(new KeyboardEvent('keyPress', { key:'e', keyCode: 69 }));
                         let code = '#1337';
                         focusedPair?.mathLine?.typedText(code)
-                        text =focusedPair?.mathLine?.latex()
+                        text = focusedPair?.mathLine?.latex()
                         console.log(text);
                         if (text && text.length == 0)
                         {
