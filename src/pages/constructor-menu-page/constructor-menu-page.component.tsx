@@ -22,6 +22,11 @@ import "./constructor-menu-page.styles.scss";
 import RulePackConstructorRequestsHandler from "../../constructors/rule-pack-constructor/rule-pack-constructor.requests-handler";
 import { RulePackConstructorReceivedForm } from "../../constructors/rule-pack-constructor/rule-pack-constructor.types";
 
+import MathQuillMultyline from "../../components/math-quill-multyline/math-quill-multyline";
+import TexEditorActionsTab from "../../components/tex-editor-actions-tab/tex-editor-actions-tab";
+import { addStyles, EditableMathField, MathField } from "react-mathquill";
+
+
 export const demoList = [
   "Alison Park",
   "Jackson Berger",
@@ -60,6 +65,7 @@ const ConstructorMenuPageComponent: React.FC = () => {
   const history = useHistory();
   const [items, setItems] = useState<FilterableSelectListItem[]>([]);
   const [propsToFilter, setPropsToFilter] = useState<string[]>([]);
+  const [mathField, setMathField] = useState<MathField>();
 
   useEffect(() => {
     if (activeTab && tabs.includes(activeTab)) {
@@ -406,6 +412,26 @@ const ConstructorMenuPageComponent: React.FC = () => {
   return (
     <div className="constructor-menu-page">
       <ul className="constructor-menu-page__tabs">
+      <div className="solve-math__tex-solution u-mt-md">
+        {mathField && <TexEditorActionsTab mathField={mathField} />}
+        <EditableMathField
+          latex={"\\textcolor{purple}{3+4}"}
+          mathquillDidMount={(mathField: MathField) => {
+            setMathField(mathField);
+          }}
+          style={{
+            minWidth: "42rem",
+            maxWidth: window.innerWidth - 100 + "px",
+          }}
+        />
+        <br/>
+        <MathQuillMultyline latex={"\\textcolor{purple}{3+4\\underline{3+4}}"}
+                            onChange={(S: string) => {
+                              console.log("Changed!!!")
+                              console.log(S);
+                            }}
+        />
+          </div>
         <li
           className={`constructor-menu-page__tab ${currentTab === tabs[0] && "constructor-menu-page__tab--active"
             }`}

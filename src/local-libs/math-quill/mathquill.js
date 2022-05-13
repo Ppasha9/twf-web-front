@@ -1094,7 +1094,7 @@ JS environment could actually contain many instances. */
           return this;
         };
         _.el = function () {
-          return this.__controller.container[0];
+          return this.__controller;
         };
         _.text = function () {
           return this.__controller.exportText();
@@ -1106,7 +1106,7 @@ JS environment could actually contain many instances. */
               this.__controller.cursor.hide().parent.blur();
             return this;
           }
-          return this.__controller.exportLatex();
+          return this.__controller;
         };
         _.html = function () {
           return this.__controller.root.jQ
@@ -1135,6 +1135,9 @@ JS environment could actually contain many instances. */
       _.focus = function () {
         this.__controller.textarea.focus();
         return this;
+      };
+      _.controller = function () {
+        return this.__controller;
       };
       _.blur = function () {
         this.__controller.textarea.blur();
