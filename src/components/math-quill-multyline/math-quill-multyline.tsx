@@ -573,13 +573,12 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({latex,
                           {
                             console.log(s0 + s1);
                             console.log("!!!" + s1[0]);
-                            if (s1[0] == '}' /*&& s0[s0.length - 1] != '}' && s0[s0.length - 1] != '{'*/ )
-                              s0 = s0.slice(0, s0.length - 1);
-                            mathPairs[mathPairsid[currPair]].text = s0 + s1;
-                            mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
-                            for (let i = 0; i < s1.length; i++) {
-                              mathPairs[mathPairsid[currPair]]?.mathLine?.keystroke('Left');
-                            }
+                            //if (s1[0] == '}' /*&& s0[s0.length - 1] != '}' && s0[s0.length - 1] != '{'*/ )
+                            //  s0 = s0.slice(0, s0.length - 1);
+                            //mathPairs[mathPairsid[currPair]].text = s0 + s1;
+                            //mathPairs[mathPairsid[currPair]]?.mathLine?.latex( s0 + s1);
+                            for (let i = 0; i < "#1337".length; i++)
+                              mathPairs[mathPairsid[currPair]]?.mathLine?.keystroke('Backspace');
 
                           }
                         }
