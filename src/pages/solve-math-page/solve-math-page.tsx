@@ -46,9 +46,10 @@ const SolveMathPage: React.FC = () => {
   const [errMessages, setErrMessages] = useState<(string | null)[]>([]);
   const [successMessages, setSuccessMessages] = useState<
     ("Правильно!" | null)[]
-  >([]);
+    >([]);
   const [mathField, setMathField] = useState<MathField>();
   const [lastSentLogSolution, setLastSentLogSolution] = useState<string>("");
+  const [solutionInTex, setSolutionInTex] = useState<string>("");
 
   // UTILS
   const sendLog = (data: SendLogForm): Promise<AxiosResponse> => {
@@ -185,9 +186,9 @@ const SolveMathPage: React.FC = () => {
       for (let idx = 0; idx < solutions.length; idx++) {
         const solution = solutions[idx];
         const checkRes = checkTexSolutionInFrontFormat(
-            solution,
-            taskSet?.tasks[idx],
-            rulePacks
+          solution,
+          taskSet?.tasks[idx],
+          rulePacks
         );
         if (checkRes.errorMessage) {
           await sendLog(prepareDataForLogging("loose", solution, taskSet, idx));
@@ -286,7 +287,30 @@ const SolveMathPage: React.FC = () => {
             </Steps>
           </div>
           <div className="solve-math__tex-solution u-mt-md">
-            <MathQuillMultyline/>
+            {/*mathField && <TexEditorActionsTab mathField={mathField} />*/}
+            {!mathField &&
+              <EditableMathField
+                latex={solutions[currentTaskIdx]}
+                mathquillDidMount={(mathField: MathField) => {
+                  setMathField(mathField);
+                }}
+                style={{
+                  minWidth: "42rem",
+                  maxWidth: window.innerWidth - 100 + "px",
+                }}
+              />
+            }
+            <MathQuillMultyline
+              latex={solutionInTex.length == 0? solutions[currentTaskIdx]: solutionInTex}
+              onChange={(s: string) => {
+                //console.log(mathField);
+                console.log("solutionInTex");
+                //mathField?.latex(s)
+                setSolutionInTex(s);
+                //console.log(mathField?.latex());
+                console.log(s);
+              }}
+            />
           </div>
           <ServerResponseAlert
             errorMsg={errMessages[currentTaskIdx]}
@@ -316,7 +340,11 @@ const SolveMathPage: React.FC = () => {
                 className="btn u-mr-sm"
                 onClick={() => {
                   if (mathField) {
-                    onCheckTex(mathField?.latex());
+                    //console.log(mathField?.latex())
+                    //onCheckTex(mathField?.latex());
+                    console.log(solutionInTex);
+                    onCheckTex(solutionInTex);
+                    setSolutionInTex("")
                   }
                 }}
               >
