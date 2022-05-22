@@ -52,3 +52,10 @@ it('FindOpenTags -- test1', () => {
   expect(a?.flagPoss).toBeTruthy();
   expect(a?.L).toBe(2);
 });
+it('FindOpenTags -- test2', () => {
+  let a = FindOpenTags(["{"], "\\textcolor{red}{\\textcolor{purple}{=}P\\left(m\\right)\\cdot ");
+  expect(a).toBeDefined();
+  expect(a?.out).toBe("\\textcolor{red}{");
+  expect(a?.flagPoss).toBeTruthy();
+  expect(a?.L).toBe(1);
+});

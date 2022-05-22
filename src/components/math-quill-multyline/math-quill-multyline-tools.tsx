@@ -77,6 +77,8 @@ const FindOpenTags = (tagList: string[], text: string) => {
   // Possibility flag
   let flagPoss = true;
   let tagsCompleted = 0;
+  console.log("Start")
+  // scan text
   for (let i = text.length - 1; i >= 0; i--) {
     if (tagList.length == 0) {
       let out = "";
@@ -88,7 +90,9 @@ const FindOpenTags = (tagList: string[], text: string) => {
       let L = tagListNew.length;
       return {out, flagPoss, L};
     }
-
+    // if } -- push
+    // if { -- pop
+    //
     switch (text[i]) {
       case '}':
         tagList.push("{");
@@ -106,11 +110,13 @@ const FindOpenTags = (tagList: string[], text: string) => {
       case '[':
       case '(':
         let t = tagList.pop();
+        // some completed? tags
         if (tagsCompleted > 0)
         {
           tagsCompleted--;
           if (t != text[i])
           {
+            // completed tag is not completed
             console.log("Error");
             console.log(t);
             console.log(text[i]);
@@ -119,9 +125,12 @@ const FindOpenTags = (tagList: string[], text: string) => {
         }
         else
         {
+          console.log("here")
+          // it`s our tag
           let flag = true;
           if (text[i] == '{')
           {
+            // is underlined tag?
             if (i >= "\\underline".length)
             {
               let str = text.slice(i - "\\underline".length, i);
@@ -129,11 +138,14 @@ const FindOpenTags = (tagList: string[], text: string) => {
               console.log("\\underline".length);
               if (str === "\\underline")
               {
+                // yes!
                 tagListNew.push("\\underline{");
                 flag = false;
+
               }
               else
               {
+                // no
                 console.log("debug2");
                 console.log(str);
                 console.log(text);
@@ -141,12 +153,14 @@ const FindOpenTags = (tagList: string[], text: string) => {
               }
             }
             else {
+              // no
               console.log("debug");
               console.log(text);
               console.log(i);
 
             }
-            if (i > "\\textcolor{red}".length && flag)
+            // is textcolor tag?
+            if (i >= "\\textcolor{red}".length && flag)
               if (text[i - 1] == '}') {
                 let j = i;
                 let s = "";
@@ -163,6 +177,7 @@ const FindOpenTags = (tagList: string[], text: string) => {
                 }
                 else
                 {
+                  // yes?
                   // check correct
                   console.log("checking");
                   let s1 = s.slice(0, "textcolor".length);
@@ -173,6 +188,7 @@ const FindOpenTags = (tagList: string[], text: string) => {
                   }
                   else
                   {
+                    // no((
                     console.log("different");
                     console.log(s1);
                     console.log(s);
