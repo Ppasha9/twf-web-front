@@ -149,6 +149,8 @@ const SolveMathPage: React.FC = () => {
       selectedTaskIdx >= 0 &&
       selectedTaskIdx < taskSet?.tasks.length
     ) {
+      // remove old solution data
+      setSolutionInTex("");
       setCurrentTaskIdx((prevIdx: number) => {
         if (mathField.latex() !== lastSentLogSolution) {
           sendLog(
@@ -177,6 +179,7 @@ const SolveMathPage: React.FC = () => {
 
         return selectedTaskIdx;
       });
+      //setSolutionInTex(solutions[currentTaskIdx]);
     }
   };
 
@@ -343,7 +346,7 @@ const SolveMathPage: React.FC = () => {
                     //console.log(mathField?.latex())
                     //onCheckTex(mathField?.latex());
                     console.log(solutionInTex);
-                    onCheckTex(solutionInTex);
+                    onCheckTex(solutionInTex.length == 0? solutions[currentTaskIdx]: solutionInTex);
                     setSolutionInTex("")
                   }
                 }}
