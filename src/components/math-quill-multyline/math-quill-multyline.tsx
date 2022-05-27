@@ -30,8 +30,9 @@ import { EndString, BeginString, FindOpenTags } from "./math-quill-multyline-too
 
 interface MathPair {
   text?: string;
-  id?: number;
+  id?: number; // -1 if deleted int otherwise
   mathLine?: MathField;
+  shiftCursor?: number; // left side shift relative
 }
 
 type MultylineProps = {
@@ -179,6 +180,18 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
       if (mathPairs[i].text) {
         mathPairs[i].mathLine?.latex(mathPairs[i].text as string);
       }
+      if (mathPairs[i] && focusId == mathPairs[i].id) {
+        mathPairs[i].mathLine?.focus();
+        if (mathPairs[i].shiftCursor != -1 && (mathPairs[i].shiftCursor || mathPairs[i].shiftCursor == 0)) {
+          mathPairs[i].mathLine?.moveToLeftEnd();
+          let a = mathPairs[i].shiftCursor // check if defined
+          if (a)
+            for (let k = 0; k < a; k++)
+              mathPairs[i]?.mathLine?.keystroke("Right");
+          mathPairs[i].shiftCursor = -1
+        }
+      }
+
     }
     //initcnt = (mathPairs.length)
     console.log(counter);
@@ -389,9 +402,13 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                     let idx = mathPairs.findIndex((mp: MathPair) => {
                       return mp.id == matPair.id;
                     });
-                    let newPair = { text: mathField.latex(), id: mathPairs[idx].id, mathLine: mathField };
+                    let newPair = {
+                      text: mathField.latex(),
+                      id: mathPairs[idx].id,
+                      mathLine: mathField,
+                      shiftCursor: mathPairs[idx].shiftCursor
+                    };
                     mathPairs[idx] = newPair;
-                    mathField.focus();
                     console.log("text1->" + mathField.text());
                   }}
                   onChange={(mathField: MathField) => {
@@ -405,6 +422,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                   }}
                   onFocus={() => {
                     setFocusId(matPair.id ? matPair.id : -1);
+
                     console.log("OnFocus");
                   }}
                   onKeyDown={(e) => {
@@ -450,7 +468,23 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                             }
                           }
 
+                          // find pair number id
+                          let currPairid = 0;
+                          for (let i = 0; i < mathPairsid.length; i++) {
+                            if (focusId != mathPairs[mathPairsid[i]].id)
+                              continue;
+                            if (focusId == mathPairs[mathPairsid[i]].id) {
+                              currPairid = i;
+                              break;
+                            }
+                          }
 
+                          // delete 1337 code
+                          let currPair = mathPairsid[currPairid];
+                          for (let i = 0; i < "#1337".length; i++)
+                            mathPairs[currPair]?.mathLine?.keystroke("Backspace");
+
+                          // find tags
                           console.log("s1->" + s1);
                           let tags = EndString(s0);
                           console.log("test->" + tags);
@@ -472,26 +506,11 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                             if (tags2)
                               console.log(tags2.L);
                             console.log(l);
-                            focusedPair?.mathLine?.latex(s0 + s1);
+                            //focusedPair?.mathLine?.latex(s0 + s1);
                             //focusedPair?.text = s0 + s1;
                             return;
                           }
-                          // find pair number id
-                          let currPairid = 0;
-                          for (let i = 0; i < mathPairsid.length; i++) {
-                            if (focusId != mathPairs[mathPairsid[i]].id)
-                              continue;
-                            if (focusId == mathPairs[mathPairsid[i]].id) {
-                              currPairid = i;
-                              break;
-                            }
-                          }
 
-
-                          // delete 1337 code
-                          let currPair = mathPairsid[currPairid];
-                          for (let i = 0; i < "#1337".length; i++)
-                            mathPairs[currPair]?.mathLine?.keystroke("Backspace");
 
                           /*old
                                                     let last = currPair == mathPairsid.length - 1 ? 1 : 0;
@@ -549,15 +568,20 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                             mathPairs[mathPairs.length - 1].text = s1;
                             mathPairs[mathPairs.length - 1].mathLine?.focus();
                           }*/
+                          // fill current
                           mathPairs[currPair].text = s0;
+                          mathPairs[currPair].mathLine?.blur();
                           for (let i = 0; i < listLine.length; i++) {
                             if (currPair == listLine[i]) {
                               if (i != listLine.length - 1) {
                                 mathPairs[listLine[i + 1]].text = s1;
-                                mathPairs[listLine[i + 1]].mathLine?.latex(s1);
-                              }
-                              else
-                                console.error("Last line cant be added")
+                                //mathPairs[listLine[i + 1]].mathLine?.latex(s1);
+                                mathPairs[listLine[i + 1]].mathLine?.focus();
+                                mathPairs[listLine[i + 1]].shiftCursor = 0;
+                                if (mathPairs[listLine[i + 1]].id)
+                                  setFocusId(mathPairs[listLine[i + 1]].id as number);
+                              } else
+                                console.error("Last line cant be added");
                             }
                           }
 
@@ -651,18 +675,23 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
                             if (s0.length == 0) { // cursor on start pos
                               if (currPairid > 0) { // not first line
                                 console.log(mathPairsid.length);
-                                if (mathPairs[mathPairsid[currPairid - 1]].mathLine)
+                                if (mathPairs[mathPairsid[currPairid - 1]].mathLine) {
                                   mathPairs[mathPairsid[currPairid - 1]].mathLine?.write(s1);
+                                  let l = mathPairs[mathPairsid[currPairid - 1]].mathLine?.text().length
+                                  let l2 = mathPairs[mathPairsid[currPairid]].mathLine?.text().length
+                                  if (l && l2)
+                                    mathPairs[mathPairsid[currPairid - 1]].shiftCursor = l - l2;
+                                }
                                 onButtonDelLine(mathPairs[mathPairsid[currPairid]].id);
                               } else { // first line
-                                console.log("first line -- do nothing")
+                                console.log("first line -- do nothing");
                                 /* do nothing
                                 console.log(s0 + s1);
                                 mathPairs[mathPairsid[currPair]].text = s0 + s1;
                                 mathPairs[mathPairsid[currPair]]?.mathLine?.latex(s0 + s1);*/
                               }
                             } else { // not start pos
-                              console.log("not start pos -- do nothing")
+                              console.log("not start pos -- do nothing");
                               /* do nothing
                               console.log(s0 + s1);
                                * /

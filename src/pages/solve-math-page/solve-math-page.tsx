@@ -307,11 +307,11 @@ const SolveMathPage: React.FC = () => {
               latex={solutionInTex.length == 0? solutions[currentTaskIdx]: solutionInTex}
               onChange={(s: string) => {
                 //console.log(mathField);
-                console.log("solutionInTex");
+                //console.log("solutionInTex");
                 //mathField?.latex(s)
                 setSolutionInTex(s);
                 //console.log(mathField?.latex());
-                console.log(s);
+                //console.log(s);
               }}
             />
           </div>
