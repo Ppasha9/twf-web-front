@@ -1,6 +1,6 @@
 // libs and hooks
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 // lib components
 import { Steps } from "antd";
@@ -44,9 +44,7 @@ const SolveMathPage: React.FC = () => {
   const [currentTaskIdx, setCurrentTaskIdx] = useState<number>(0);
   const [solutions, setSolutions] = useState<string[]>([]);
   const [errMessages, setErrMessages] = useState<(string | null)[]>([]);
-  const [successMessages, setSuccessMessages] = useState<
-    ("Правильно!" | null)[]
-    >([]);
+  const [successMessages, setSuccessMessages] = useState<("Правильно!" | null)[]>([]);
   const [mathField, setMathField] = useState<MathField>();
   const [lastSentLogSolution, setLastSentLogSolution] = useState<string>("");
   const [solutionInTex, setSolutionInTex] = useState<string>("");
@@ -58,8 +56,8 @@ const SolveMathPage: React.FC = () => {
       url: process.env.REACT_APP_SERVER_API + "/log/activity/create",
       data,
       headers: {
-        Authorization: "Bearer " + getAuthToken(),
-      },
+        Authorization: "Bearer " + getAuthToken()
+      }
     })
       .then((res: AxiosResponse) => {
         console.log("Log sent!", res);
@@ -87,9 +85,21 @@ const SolveMathPage: React.FC = () => {
     taskCode: taskSet.tasks[currentTaskIdx].code,
     tasksetCode: taskSet.code,
     tasksetVersion: 0,
-    taskVersion: 0,
+    taskVersion: 0
   });
 
+  const modes = [0, 1];
+  const { mode: modeUrl } = Object.fromEntries(
+    useLocation()
+      .search.slice(1)
+      .split("&")
+      .map((queryStr) => {
+        return queryStr.split("=");
+      })
+  );
+  const [currentMode, setCurrentMode] = useState(
+    modes.includes(modeUrl) ? modeUrl : 0
+  );
   // USER ACTIONS
   const onCheckTex = (solutionInTex: string): void => {
     if (taskSet?.tasks[currentTaskIdx]) {
@@ -164,12 +174,19 @@ const SolveMathPage: React.FC = () => {
             setLastSentLogSolution(mathField.latex());
           });
         }
-        setSolutions((prevState: string[]) =>
-          prevState.map((solution: string, i: number) =>
-            i === prevIdx ? solutionInTex/*mathField.latex()*/ : solution
-          )
-        );
-        let newScrollLeft = selectedTaskIdx * document.getElementsByClassName('ant-steps-item')[0].clientWidth;
+        if (modeUrl == 1)
+          setSolutions((prevState: string[]) =>
+            prevState.map((solution: string, i: number) =>
+              i === prevIdx ? solutionInTex/*mathField.latex()*/ : solution
+            )
+          );
+        else
+          setSolutions((prevState: string[]) =>
+            prevState.map((solution: string, i: number) =>
+              i === prevIdx ? mathField.latex() : solution
+            )
+          );
+        let newScrollLeft = selectedTaskIdx * document.getElementsByClassName("ant-steps-item")[0].clientWidth;
         let halfOfOfDiv = tasksRef.current!.clientWidth / 2;
         if (newScrollLeft > halfOfOfDiv) {
           tasksRef.current!.scrollLeft = newScrollLeft - halfOfOfDiv;
@@ -179,8 +196,10 @@ const SolveMathPage: React.FC = () => {
 
         return selectedTaskIdx;
       });
+
+      if (modeUrl == 1)
+        setSolutionInTex("");
       //setSolutionInTex(solutions[currentTaskIdx]);
-      setSolutionInTex("");
     }
   };
 
@@ -219,7 +238,7 @@ const SolveMathPage: React.FC = () => {
         setSolutions(
           res.taskset.tasks.map(
             (task: TaskConstructorReceivedForm) =>
-              `${task.originalExpressionTex}=...${task.goalExpressionTex === null || task.goalExpressionTex === '' ? '' : `=${task.goalExpressionTex}`}`
+              `${task.originalExpressionTex}=...${task.goalExpressionTex === null || task.goalExpressionTex === "" ? "" : `=${task.goalExpressionTex}`}`
           )
         );
         setIsTaskSetFetched(true);
@@ -251,7 +270,7 @@ const SolveMathPage: React.FC = () => {
     taskSet,
     mathField,
     lastSentLogSolution,
-    currentTaskIdx,
+    currentTaskIdx
   ]);
 
   const getDirection = () => {
@@ -261,6 +280,7 @@ const SolveMathPage: React.FC = () => {
       return "vertical";
     }
   };
+
 
   if (isTaskSetFetched) {
     if (taskSet?.tasks && taskSet?.tasks.length > 0) {
@@ -291,8 +311,19 @@ const SolveMathPage: React.FC = () => {
             </Steps>
           </div>
           <div className="solve-math__tex-solution u-mt-md">
-            {/*mathField && <TexEditorActionsTab mathField={mathField} />*/}
-            {!mathField &&
+            {modeUrl == 0 && mathField && <TexEditorActionsTab mathField={mathField} />}
+            {modeUrl == 0 &&  <EditableMathField
+              latex={solutions[currentTaskIdx]}
+              mathquillDidMount={(mathField: MathField) => {
+                setMathField(mathField);
+              }}
+              style={{
+                minWidth: "42rem",
+                maxWidth: window.innerWidth - 100 + "px"
+              }}
+            />
+            }
+            {modeUrl == 1 && !mathField &&
               <EditableMathField
                 latex={solutions[currentTaskIdx]}
                 mathquillDidMount={(mathField: MathField) => {
@@ -300,21 +331,22 @@ const SolveMathPage: React.FC = () => {
                 }}
                 style={{
                   minWidth: "42rem",
-                  maxWidth: window.innerWidth - 100 + "px",
+                  maxWidth: window.innerWidth - 100 + "px"
                 }}
               />
             }
-            <MathQuillMultyline
-              latex={solutionInTex.length == 0? solutions[currentTaskIdx]: solutionInTex}
-              onChange={(s: string) => {
-                //console.log(mathField);
-                //console.log("solutionInTex");
-                //mathField?.latex(s)
-                setSolutionInTex(s);
-                //console.log(mathField?.latex());
-                //console.log(s);
-              }}
-            />
+            {modeUrl == 1 &&
+              <MathQuillMultyline
+                latex={solutionInTex.length == 0 ? solutions[currentTaskIdx] : solutionInTex}
+                onChange={(s: string) => {
+                  //console.log(mathField);
+                  //console.log("solutionInTex");
+                  //mathField?.latex(s)
+                  setSolutionInTex(s);
+                  //console.log(mathField?.latex());
+                  //console.log(s);
+                }}
+              />}
           </div>
           <ServerResponseAlert
             errorMsg={errMessages[currentTaskIdx]}
@@ -345,10 +377,14 @@ const SolveMathPage: React.FC = () => {
                 onClick={() => {
                   if (mathField) {
                     //console.log(mathField?.latex())
-                    //onCheckTex(mathField?.latex());
-                    console.log(solutionInTex);
-                    onCheckTex(solutionInTex.length == 0? solutions[currentTaskIdx]: solutionInTex);
-                    setSolutionInTex("")
+                    //
+                    if (modeUrl == 0)
+                      onCheckTex(mathField?.latex());
+                    else {
+                      console.log(solutionInTex);
+                      onCheckTex(solutionInTex.length == 0 ? solutions[currentTaskIdx] : solutionInTex);
+                      setSolutionInTex("");
+                    }
                   }
                 }}
               >
@@ -377,7 +413,7 @@ const SolveMathPage: React.FC = () => {
         errorMsg={"No tasks in taskset '" + taskSet?.nameEn + "' (code='" + taskSet?.code + "') found"}
         successMsg={""}
         style={{ margin: "2rem" }}
-      />)
+      />);
     }
   } else {
     return <AppSpinner loading={!isTaskSetFetched} />;
