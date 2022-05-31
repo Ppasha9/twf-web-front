@@ -174,7 +174,7 @@ const SolveMathPage: React.FC = () => {
             setLastSentLogSolution(mathField.latex());
           });
         }
-        if (modeUrl == 1)
+        if (currentMode == 1)
           setSolutions((prevState: string[]) =>
             prevState.map((solution: string, i: number) =>
               i === prevIdx ? solutionInTex/*mathField.latex()*/ : solution
@@ -197,7 +197,7 @@ const SolveMathPage: React.FC = () => {
         return selectedTaskIdx;
       });
 
-      if (modeUrl == 1)
+      if (currentMode == 1)
         setSolutionInTex("");
       //setSolutionInTex(solutions[currentTaskIdx]);
     }
@@ -311,8 +311,8 @@ const SolveMathPage: React.FC = () => {
             </Steps>
           </div>
           <div className="solve-math__tex-solution u-mt-md">
-            {modeUrl == 0 && mathField && <TexEditorActionsTab mathField={mathField} />}
-            {modeUrl == 0 &&  <EditableMathField
+            {currentMode == 0 && mathField && <TexEditorActionsTab mathField={mathField} />}
+            {currentMode == 0 &&  <EditableMathField
               latex={solutions[currentTaskIdx]}
               mathquillDidMount={(mathField: MathField) => {
                 setMathField(mathField);
@@ -323,7 +323,7 @@ const SolveMathPage: React.FC = () => {
               }}
             />
             }
-            {modeUrl == 1 && !mathField &&
+            {currentMode == 1 && !mathField &&
               <EditableMathField
                 latex={solutions[currentTaskIdx]}
                 mathquillDidMount={(mathField: MathField) => {
@@ -335,7 +335,7 @@ const SolveMathPage: React.FC = () => {
                 }}
               />
             }
-            {modeUrl == 1 &&
+            {currentMode == 1 &&
               <MathQuillMultyline
                 latex={solutionInTex.length == 0 ? solutions[currentTaskIdx] : solutionInTex}
                 onChange={(s: string) => {
@@ -378,7 +378,7 @@ const SolveMathPage: React.FC = () => {
                   if (mathField) {
                     //console.log(mathField?.latex())
                     //
-                    if (modeUrl == 0)
+                    if (currentMode == 0)
                       onCheckTex(mathField?.latex());
                     else {
                       console.log(solutionInTex);
