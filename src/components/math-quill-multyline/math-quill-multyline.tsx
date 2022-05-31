@@ -177,7 +177,7 @@ const MathQuillMultyline: React.FC<MultylineProps> = ({
         continue;
       mathPairs[i].text = splitted[j];
       j++;
-      if (mathPairs[i].text) {
+      if (mathPairs[i].text || mathPairs[i].text == "") {
         mathPairs[i].mathLine?.latex(mathPairs[i].text as string);
       }
       if (mathPairs[i] && focusId == mathPairs[i].id) {

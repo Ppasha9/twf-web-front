@@ -150,7 +150,7 @@ const SolveMathPage: React.FC = () => {
       selectedTaskIdx < taskSet?.tasks.length
     ) {
       // remove old solution data
-      setSolutionInTex("");
+      //setSolutionInTex("");
       setCurrentTaskIdx((prevIdx: number) => {
         if (mathField.latex() !== lastSentLogSolution) {
           sendLog(
@@ -166,7 +166,7 @@ const SolveMathPage: React.FC = () => {
         }
         setSolutions((prevState: string[]) =>
           prevState.map((solution: string, i: number) =>
-            i === prevIdx ? mathField.latex() : solution
+            i === prevIdx ? solutionInTex/*mathField.latex()*/ : solution
           )
         );
         let newScrollLeft = selectedTaskIdx * document.getElementsByClassName('ant-steps-item')[0].clientWidth;
@@ -180,6 +180,7 @@ const SolveMathPage: React.FC = () => {
         return selectedTaskIdx;
       });
       //setSolutionInTex(solutions[currentTaskIdx]);
+      setSolutionInTex("");
     }
   };
 
