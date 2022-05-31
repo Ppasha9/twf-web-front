@@ -84,7 +84,7 @@ const FindOpenTags = (tagList: string[], text: string) => {
       let out = "";
       console.log(tagListNew);
       for (let i = 0; i < tagListNew.length; i++) {
-        out += tagListNew[i];
+        out = tagListNew[i] + out;
       }
       console.log(flagPoss);
       let L = tagListNew.length;
